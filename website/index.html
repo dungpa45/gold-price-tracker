@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Giá Vàng Hôm Nay - Gold Price Tracker</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>📊 Giá Vàng Hôm Nay</h1>
+      <p class="subtitle">Gold Price Tracker - Vietnam</p>
+      <div class="update-info">
+        <span id="lastUpdate">Đang tải dữ liệu...</span>
+        <button id="refreshBtn" onclick="loadData()">🔄 Làm mới</button>
+      </div>
+    </header>
+
+    <main>
+      <!-- Date Selection Section -->
+      <section class="section">
+        <h2>📅 Chọn Thời Gian</h2>
+        <div class="date-controls">
+          <div class="view-type-buttons">
+            <button class="view-type-btn active" onclick="changeViewType('current')">Hiện tại</button>
+            <button class="view-type-btn" onclick="changeViewType('daily')">Theo ngày</button>
+            <button class="view-type-btn" onclick="changeViewType('monthly')">Theo tháng</button>
+          </div>
+
+          <div class="date-group" id="dateSelection" style="display: none;">
+            <label for="selectedDate">📅 Chọn ngày:</label>
+            <input type="date" id="selectedDate" onchange="loadDataForDate()">
+          </div>
+
+          <div class="date-group" id="monthSelection" style="display: none;">
+            <label for="selectedYear">📅 Chọn năm:</label>
+            <select id="selectedYear" onchange="updateMonthButtons()">
+              <option value="2024">2024</option>
+              <option value="2025" selected>2025</option>
+            </select>
+            <div class="month-buttons" id="monthButtons">
+              <button class="month-btn" data-month="01" onclick="selectMonth('01')">Tháng 1</button>
+              <button class="month-btn" data-month="02" onclick="selectMonth('02')">Tháng 2</button>
+              <button class="month-btn" data-month="03" onclick="selectMonth('03')">Tháng 3</button>
+              <button class="month-btn" data-month="04" onclick="selectMonth('04')">Tháng 4</button>
+              <button class="month-btn" data-month="05" onclick="selectMonth('05')">Tháng 5</button>
+              <button class="month-btn" data-month="06" onclick="selectMonth('06')">Tháng 6</button>
+              <button class="month-btn" data-month="07" onclick="selectMonth('07')">Tháng 7</button>
+              <button class="month-btn" data-month="08" onclick="selectMonth('08')">Tháng 8</button>
+              <button class="month-btn" data-month="09" onclick="selectMonth('09')">Tháng 9</button>
+              <button class="month-btn" data-month="10" onclick="selectMonth('10')">Tháng 10</button>
+              <button class="month-btn" data-month="11" onclick="selectMonth('11')">Tháng 11</button>
+              <button class="month-btn" data-month="12" onclick="selectMonth('12')">Tháng 12</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Current Prices Section -->
+      <section class="section" id="currentPricesSection">
+        <h2>💰 Giá Vàng Hiện Tại</h2>
+        <div class="table-responsive">
+          <table id="currentPrices">
+            <thead>
+              <tr>
+                <th>Loại vàng</th>
+                <th>Mua vào</th>
+                <th>Bán ra</th>
+                <th>Chênh lệch</th>
+              </tr>
+            </thead>
+            <tbody id="pricesTableBody">
+              <tr>
+                <td colspan="4" class="loading">Đang tải dữ liệu...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Historical Chart Section -->
+      <section class="section">
+        <h2 id="chartTitle">📈 So sánh vàng trong nước</h2>
+        <div class="chart-controls">
+          <div class="gold-type-buttons" id="goldTypeButtons">
+            <!-- Gold type buttons will be populated here -->
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="priceChart"></canvas>
+        </div>
+      </section>
+
+      <!-- Monthly Summary Chart Section -->
+      <section class="section" id="monthlySummarySection">
+        <h2 id="monthlySummaryTitle">📊 Biến động giá </h2>
+        <div class="chart-controls">
+          <div class="gold-type-buttons" id="monthlyGoldTypeButtons">
+            <!-- Gold type buttons will be populated here -->
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="monthlySummaryChart"></canvas>
+        </div>
+      </section>
+
+      <!-- World Gold Price Section -->
+      <section class="section" id="worldGoldSection">
+        <h2>🌍 Giá Vàng Thế Giới (USD)</h2>
+        <div class="world-gold-container">
+          <div class="chart-container">
+            <canvas id="worldGoldChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Comparison Table Section -->
+      <section class="section">
+        <h2>📊 So Sánh Giá</h2>
+        <div class="comparison-grid" id="comparisonGrid">
+          <div class="loading">Đang tải dữ liệu so sánh...</div>
+        </div>
+      </section>
+
+      <!-- Trend Analysis Section -->
+      <section class="section">
+        <h2>📉 Phân Tích Xu Hướng</h2>
+        <div class="trend-grid" id="trendGrid">
+          <div class="loading">Đang tải phân tích xu hướng...</div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>© 2025 Gold Price Tracker | Dữ liệu từ VNExpress</p>
+      <p class="disclaimer">Giá vàng chỉ mang tính chất tham khảo. Vui lòng liên hệ trực tiếp với cửa hàng để biết giá
+        chính xác.</p>
+    </footer>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+
+</html>
