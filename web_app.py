@@ -24,6 +24,14 @@ def static_files(filename):
 
 @app.route('/api/data')
 def api_data():
+    # Disable caching for API responses
+    from flask import make_response
+    
+    def add_no_cache_headers(response):
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        return response
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -137,16 +145,18 @@ def api_data():
         print(f"Returning {len(current_prices)} current prices")
         print(f"Chart data keys: {list(chart_data.keys())}")
         
-        return jsonify({
+        response = make_response(jsonify({
             'last_updated': datetime.now().isoformat(),
             'current_prices': current_prices,
             'chart_data': chart_data,
             'statistics': stats,
             'view_type': view_type
-        })
+        }))
+        return add_no_cache_headers(response)
         
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        response = make_response(jsonify({'error': str(e)}), 500)
+        return add_no_cache_headers(response)
 
 def serve_website(port=8001):
     print(f"Starting Flask server at http://localhost:{port}")
